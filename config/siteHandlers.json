@@ -376,7 +376,7 @@
     {
       "name": "Grok",
       "url": "https://grok.com/",
-      "enabled": true,
+      "enabled": false,
       "supportUrlQuery": false,
       "region": "US",
       "hidden": false,
@@ -570,7 +570,7 @@
     {
       "name": "Claude",
       "url": "https://claude.ai/chat",
-      "enabled": false,
+      "enabled": true,
       "supportUrlQuery": false,
       "region": "US",
       "hidden": false,
