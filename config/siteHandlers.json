@@ -1,8 +1,6 @@
 {
-  "version": "1.2.7",
-  "lastUpdated": "2026-05-03T13:56:47.698Z",
-  "description": "支持重试功能",
-  "author": "AIShortcuts",
+  "version": "1.2.8",
+  "lastUpdated": "2026-07-04T13:56:47.698Z",
   "sites": [
     {
       "name": "ChatGPT",
@@ -469,6 +467,28 @@
         ]
       },
       "contentExtractor": {
+        "latestVisibleResponse": {
+          "messageSelector": "#last-reply-container [id^=\"response-\"][class*=\"items-start\"] .response-content-markdown.markdown, #last-reply-container [id^=\"response-\"][class*=\"items-start\"] .response-content-markdown, [id^=\"response-\"][class*=\"items-start\"] .response-content-markdown.markdown, [id^=\"response-\"][class*=\"items-start\"] .response-content-markdown",
+          "ignoredAncestorSelectors": [
+            ".thinking-container",
+            "[data-testid*=\"thinking\"]",
+            ".action-buttons",
+            "button",
+            "[class*=\"copy\"]",
+            "nav",
+            "header",
+            "footer"
+          ],
+          "ignoredTextPatterns": [
+            "^Copy$",
+            "^Copied$",
+            "^Share$",
+            "^Retry$",
+            "^Edit image$",
+            "^Reasoning$",
+            "^Thinking$"
+          ]
+        },
         "containerSelector": "#last-reply-container",
         "messageContainer": "#last-reply-container [id^=\"response-\"]",
         "contentSelectors": [
@@ -492,6 +512,7 @@
         "thinkingBlockFilters": [
           "[class*=\"thinking\"]",
           "[data-testid*=\"thinking\"]",
+          ".thinking-container",
           ".transition-all.rounded-lg",
           "[class*=\"internal\"]"
         ],
@@ -533,8 +554,15 @@
         "urlFeature": "/c/"
       },
       "userPrompt": {
-        "containerSelector": "#last-reply-container [id^=\"response-\"][class*=\"items-end\"]",
-        "textSelector": ".response-content-markdown.markdown, .response-content-markdown"
+        "containerSelector": [
+          "#last-reply-container [id^=\"response-\"][class*=\"items-end\"] div[data-testid=\"user-message\"]",
+          "#last-reply-container [id^=\"response-\"][class*=\"items-end\"]",
+          "[id^=\"response-\"][class*=\"items-end\"] div[data-testid=\"user-message\"]",
+          "[id^=\"response-\"][class*=\"items-end\"]"
+        ],
+        "textSelector": "div[data-testid=\"user-message\"], .response-content-markdown.markdown, .response-content-markdown",
+        "messageNodeSelector": "[id^=\"response-\"]",
+        "requireMessageNode": true
       },
       "icon": "grok.com.png",
       "type": "information"
@@ -728,7 +756,7 @@
       "enabled": true,
       "supportUrlQuery": false,
       "region": "US",
-      "hidden": false,
+      "hidden": true,
       "supportIframe": true,
       "searchHandler": {
         "steps": [
@@ -823,7 +851,7 @@
         "textSelector": "ms-prompt-chunk p, ms-prompt-chunk span"
       },
       "icon": "aistudio.google.com.png",
-      "type": "Agents"
+      "type": "information"
     },
     {
       "name": "DeepSeek",
@@ -907,27 +935,39 @@
         ]
       },
       "contentExtractor": {
-        "selectors": [
-          "[data-message-author-role=\"assistant\"] .markdown",
-          "[data-message-author-role=\"assistant\"]",
-          ".deepseek-message .markdown",
-          ".deepseek-message",
+        "latestVisibleResponse": {
+          "messageSelector": ".ds-message .ds-markdown, [data-message-author-role=\"assistant\"] .markdown, [data-message-author-role=\"assistant\"] .ds-markdown",
+          "ignoredAncestorSelectors": [
+            "button",
+            "[class*=\"copy\"]",
+            "[class*=\"input\"]",
+            "[class*=\"prompt\"]",
+            ".attachment",
+            "[class*=\"attachment\"]",
+            "nav",
+            "header",
+            "footer",
+            "aside"
+          ]
+        },
+        "messageContainer": ".ds-message, [data-message-author-role=\"assistant\"]",
+        "contentSelectors": [
+          ".ds-markdown",
+          ".markdown",
           ".message-content .markdown",
-          ".message-content",
-          "[class*=\"deepseek\"][class*=\"message\"]",
-          "[class*=\"deepseek\"]",
-          "[class*=\"message\"]",
-          "[class*=\"response\"]",
-          "[class*=\"conversation\"]",
-          "[class*=\"chat\"]",
-          ".deepseek-response",
-          "[class*=\"deepseek-response\"]",
-          ".ai-response",
-          "[class*=\"ai-response\"]",
-          ".chat-message",
-          "[class*=\"chat-message\"]"
+          ".message-content"
+        ],
+        "selectors": [
+          ".ds-message .ds-markdown",
+          "[data-message-author-role=\"assistant\"] .markdown",
+          "[data-message-author-role=\"assistant\"] .ds-markdown",
+          ".message-content .markdown",
+          ".message-content"
         ],
         "fallbackSelectors": [
+          ".ds-message .ds-markdown",
+          ".ds-message",
+          "[data-message-author-role=\"assistant\"]",
           "main",
           "article",
           ".container",
@@ -955,14 +995,21 @@
           "[class*=\"stop\"]",
           ".attachment",
           "[class*=\"attachment\"]"
-        ]
+        ],
+        "exportLatestOnly": true
       },
       "historyHandler": {
         "urlFeature": "/chat/"
       },
       "userPrompt": {
-        "containerSelector": "div.ds-message:has(> div:not(.ds-markdown))",
-        "textSelector": ":scope > div:not(.ds-markdown)"
+        "containerSelector": [
+          "[data-message-author-role=\"user\"]",
+          ".ds-message[data-message-author-role=\"user\"]",
+          "div.ds-message:has(> div:not(.ds-markdown))"
+        ],
+        "textSelector": ".ds-markdown, .markdown, .message-content, [class*=\"message-content\"], :scope > div:not(.ds-markdown), p, span",
+        "messageNodeSelector": "[data-message-author-role=\"user\"], .ds-message[data-message-author-role=\"user\"]",
+        "requireMessageNode": true
       },
       "icon": "chat.deepseek.com.png",
       "type": "information"
@@ -979,7 +1026,7 @@
         "steps": [
           {
             "action": "focus",
-            "selector": "textarea[placeholder=\"给点点发消息\"]",
+            "selector": "textarea[placeholder=\"给点点发消息\"], textarea[placeholder=\"给点点发消息...\"]",
             "waitForElement": true,
             "maxAttempts": 10,
             "retryInterval": 300,
@@ -987,7 +1034,7 @@
           },
           {
             "action": "setValue",
-            "selector": "textarea[placeholder=\"给点点发消息\"]",
+            "selector": "textarea[placeholder=\"给点点发消息\"], textarea[placeholder=\"给点点发消息...\"]",
             "waitForElement": true,
             "maxAttempts": 10,
             "retryInterval": 300,
@@ -995,7 +1042,7 @@
           },
           {
             "action": "triggerEvents",
-            "selector": "textarea[placeholder=\"给点点发消息\"]",
+            "selector": "textarea[placeholder=\"给点点发消息\"], textarea[placeholder=\"给点点发消息...\"]",
             "events": [
               "beforeinput",
               "input",
@@ -1017,7 +1064,7 @@
           },
           {
             "action": "click",
-            "selector": "button:has(svg.lucide-arrow-up)",
+            "selector": "button[aria-disabled]:has(svg path[d=\"m5 12 7-7 7 7\"]):has(svg path[d=\"M12 19V5\"])",
             "retryOnDisabled": true,
             "maxAttempts": 6,
             "retryInterval": 500,
@@ -1078,58 +1125,82 @@
       "searchHandler": {
         "steps": [
           {
+            "action": "wait",
+            "duration": 1200,
+            "description": "等待豆包输入区完成挂载",
+            "maxAttempts": 10,
+            "retryInterval": 200
+          },
+          {
             "action": "focus",
             "selector": [
-              "textarea[placeholder=\"发消息...\"]",
+              ".semi-input-textarea-wrapper > textarea.semi-input-textarea",
+              "textarea.semi-input-textarea.semi-input-textarea-autosize",
               "textarea[data-testid=\"chat_input_input\"]",
-              "[role=\"textbox\"]",
+              "textarea[placeholder=\"发消息...\"]",
+              "textarea[placeholder*=\"发消息\"]",
               "textarea[placeholder=\"输入主题和报告要求\"]",
-              ".message-input-textarea-separation"
+              ".message-input-textarea-separation",
+              "[role=\"textbox\"]"
             ],
             "description": "聚焦豆包输入框",
             "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
+            "maxAttempts": 40,
+            "retryInterval": 500
           },
           {
             "action": "setValue",
             "selector": [
-              "textarea[placeholder=\"发消息...\"]",
+              ".semi-input-textarea-wrapper > textarea.semi-input-textarea",
+              "textarea.semi-input-textarea.semi-input-textarea-autosize",
               "textarea[data-testid=\"chat_input_input\"]",
-              "[role=\"textbox\"]",
+              "textarea[placeholder=\"发消息...\"]",
+              "textarea[placeholder*=\"发消息\"]",
               "textarea[placeholder=\"输入主题和报告要求\"]",
-              ".message-input-textarea-separation"
+              ".message-input-textarea-separation",
+              "[role=\"textbox\"]"
             ],
             "description": "设置豆包输入框的值",
             "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
+            "maxAttempts": 40,
+            "retryInterval": 500
           },
           {
-            "action": "sendKeys",
+            "action": "triggerEvents",
             "selector": [
-              "textarea[placeholder=\"发消息...\"]",
+              ".semi-input-textarea-wrapper > textarea.semi-input-textarea",
+              "textarea.semi-input-textarea.semi-input-textarea-autosize",
               "textarea[data-testid=\"chat_input_input\"]",
-              "[role=\"textbox\"]",
+              "textarea[placeholder=\"发消息...\"]",
+              "textarea[placeholder*=\"发消息\"]",
               "textarea[placeholder=\"输入主题和报告要求\"]",
-              ".message-input-textarea-separation"
+              ".message-input-textarea-separation",
+              "[role=\"textbox\"]"
             ],
-            "keys": "Enter",
-            "description": "发送回车键",
+            "events": [
+              "beforeinput",
+              "input",
+              "change",
+              "focus"
+            ],
+            "description": "触发豆包输入事件以启用发送按钮",
             "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
+            "maxAttempts": 40,
+            "retryInterval": 500
           },
           {
             "action": "wait",
-            "duration": 200,
-            "description": "等待研究态按钮就绪",
+            "duration": 300,
+            "description": "等待发送按钮状态更新",
             "maxAttempts": 10,
             "retryInterval": 200
           },
           {
             "action": "click",
             "selector": [
+              "#flow-end-msg-send",
+              ".send-btn-wrapper > button#flow-end-msg-send",
+              ".send-btn-wrapper > button",
               ".message-input-right-button-send button",
               ".message-input-right-button-send [role=\"button\"]",
               ".message-input-right-button-send .omni-button-content-btn",
@@ -1137,13 +1208,14 @@
               "button[aria-label*=\"Submit\"]",
               "button[title*=\"发送\"]"
             ],
+            "required": true,
             "condition": {
-              "selector": "textarea[placeholder=\"输入主题和报告要求\"], .message-input-textarea-separation, [role=\"textbox\"]"
+              "selector": ".semi-input-textarea-wrapper > textarea.semi-input-textarea, textarea.semi-input-textarea.semi-input-textarea-autosize, textarea[data-testid=\"chat_input_input\"], textarea[placeholder=\"发消息...\"], textarea[placeholder*=\"发消息\"], textarea[placeholder=\"输入主题和报告要求\"], .message-input-textarea-separation, [role=\"textbox\"]"
             },
             "retryOnDisabled": true,
             "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200,
+            "maxAttempts": 40,
+            "retryInterval": 500,
             "description": "点击豆包发送按钮"
           }
         ]
@@ -1153,8 +1225,11 @@
           {
             "action": "focus",
             "selector": [
+              ".semi-input-textarea-wrapper > textarea.semi-input-textarea",
+              "textarea.semi-input-textarea.semi-input-textarea-autosize",
+              "textarea[data-testid=\"chat_input_input\"]",
               "textarea[placeholder=\"发消息...\"]",
-              "textarea[data-testid=\"chat_input_input\"]"
+              "textarea[placeholder*=\"发消息\"]"
             ],
             "description": "聚焦豆包输入框准备文件粘贴",
             "waitForElement": true,
@@ -1176,12 +1251,15 @@
       },
       "deepResearchHandler": {
         "enabledSelectors": [
-          "div[data-slate-editor=\"true\"][role=\"textbox\"]"
+          "[role=\"textbox\"][data-slate-editor=\"true\"][aria-multiline=\"true\"]",
+          "div[data-slate-editor=\"true\"][data-slate-node=\"value\"][contenteditable=\"true\"][role=\"textbox\"]"
         ],
         "steps": [
           {
             "action": "click",
             "selector": [
+              "button[data-component-type=\"skill-item\"][data-input-engine-action-source=\"actionbar\"][data-skill-id=\"skill_bar_button_25\"]",
+              "button[data-skill-id=\"skill_bar_button_25\"]",
               "text:深入研究",
               "text:Deep Research"
             ],
@@ -1191,7 +1269,7 @@
       },
       "contentExtractor": {
         "latestVisibleResponse": {
-          "messageSelector": ".inner-item-w21SQO [class*=\"flow-markdown-body\"], .inner-item-w21SQO [class*=\"markdown-body\"]",
+          "messageSelector": ".message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] [data-streaming=\"false\"], .message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] .container-enLQFx, .message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] .container-qX9Csx, .message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] .container-h3Yzeb",
           "ignoredAncestorSelectors": [
             "[class*=\"suggest-message\"]",
             "[class*=\"copy\"]",
@@ -1203,22 +1281,25 @@
             "^下载电脑版$"
           ]
         },
-        "containerSelector": "div[aria-label=\"doc_editor\"]",
+        "containerSelector": ".message-list-zLoNs1",
+        "messageContainer": ".message-list-zLoNs1 [data-message-id]",
         "contentSelectors": [
-          ".inner-item-w21SQO [class*=\"flow-markdown-body\"]",
-          ".inner-item-w21SQO [class*=\"markdown-body\"]",
-          ".container-PvPoAn:not(:has(.whitespace-pre-wrap))",
-          ".item-kDun2N:not(:has(.whitespace-pre-wrap))",
-          ".w-full.inner-item-w21SQO:not(:has(.whitespace-pre-wrap))"
+          "[data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] [data-streaming=\"false\"]",
+          "[data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"]",
+          ".container-enLQFx",
+          ".container-fBOrXO",
+          ".container-qX9Csx",
+          ".container-h3Yzeb"
         ],
         "fallbackSelectors": [
-          ".content-Xv_Zw0",
-          ".message-list-S2Fv2S",
-          ".scroll-view-OEiNXD.container-gkoWqI",
-          "main"
+          ".message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"] [data-streaming=\"false\"]",
+          ".message-list-zLoNs1 [data-message-id].relative.grid [data-container-type=\"block-v2\"] [data-plugin-identifier][data-render-engine=\"node\"]",
+          ".message-list-zLoNs1 [data-message-id] .container-enLQFx",
+          ".message-list-zLoNs1 [data-message-id] .container-qX9Csx",
+          ".message-list-zLoNs1 [data-message-id] .container-fBOrXO",
+          ".message-list-zLoNs1 [data-message-id] .container-h3Yzeb"
         ],
         "excludeSelectors": [
-          "[data-plugin-identifier=\"block_type:10000\"]",
           "nav",
           "header",
           "footer",
@@ -1226,7 +1307,9 @@
           ".menu",
           "button",
           "textarea",
+          "[role=\"textbox\"]",
           "[placeholder=\"发消息...\"]",
+          "[placeholder*=\"发消息\"]",
           ".copy-button",
           "[class*=\"copy\"]",
           ".regenerate-button",
@@ -1238,15 +1321,41 @@
           "[data-testid*=\"input\"]",
           "[data-testid*=\"send\"]"
         ],
-        "userMessageSelector": "[data-plugin-identifier=\"block_type:10000\"]",
+        "userMessageSelector": ".message-list-zLoNs1 [data-message-id].flex-row.flex.w-full.justify-end [data-plugin-identifier=\"block_type:10000\"] .whitespace-pre-wrap, .message-list-zLoNs1 [data-message-id].flex-row.flex.w-full.justify-end [data-plugin-identifier*=\"send-message-box\"] [data-testid=\"message_text_content\"], .message-list-zLoNs1 .v_list_row:has([data-message-id].flex-row.flex.w-full.justify-end) [data-plugin-identifier=\"block_type:10000\"] .whitespace-pre-wrap, .message-list-zLoNs1 .v_list_row:has([data-message-id].flex-row.flex.w-full.justify-end) [data-plugin-identifier*=\"send-message-box\"] [data-testid=\"message_text_content\"], .message-list-zLoNs1 .v_list_row:has(.flex-row.flex.w-full.justify-end) .flex.max-w-full.flex-col.gap-8, .message-list-zLoNs1 .v_list_row:has(.flex-row.flex.w-full.justify-end) .w-full.inner-item-BjaxFt",
         "exportLatestOnly": true
+      },
+      "openclawRuntime": {
+        "landingPage": {
+          "requireRootLikeUrl": true,
+          "contentPatterns": [
+            "^有什么我能帮你的吗？$",
+            "^有什么我能帮你的吗\\?$"
+          ]
+        },
+        "notSubmitted": {
+          "requireRootLikeUrl": true,
+          "urlPatterns": [
+            "^https://(?:www\\.)?doubao\\.com/chat/?$"
+          ],
+          "contentPatterns": [
+            "有什么我能帮你的吗",
+            "给我一些简单易行的健康饮食建议",
+            "制定一份健康早餐食谱"
+          ]
+        }
       },
       "historyHandler": {
         "urlFeature": "/chat/"
       },
       "userPrompt": {
-        "containerSelector": "[data-plugin-identifier=\"block_type:10000\"].flex.justify-end, [data-plugin-identifier*=\"send-message-box\"] [data-testid=\"message_text_content\"]",
-        "textSelector": "[data-plugin-identifier=\"block_type:10000\"] .whitespace-pre-wrap, [data-testid=\"message_text_content\"]"
+        "containerSelector": [
+          ".message-list-zLoNs1 [data-message-id].flex-row.flex.w-full.justify-end",
+          ".message-list-zLoNs1 .v_list_row:has([data-message-id].flex-row.flex.w-full.justify-end)",
+          ".message-list-zLoNs1 .v_list_row:has(.flex-row.flex.w-full.justify-end)"
+        ],
+        "textSelector": "[data-plugin-identifier=\"block_type:10000\"] .whitespace-pre-wrap, [data-plugin-identifier*=\"send-message-box\"] [data-testid=\"message_text_content\"], .flex-row.flex.w-full.justify-end .flex.max-w-full.flex-col.gap-8, .w-full.inner-item-BjaxFt .flex.max-w-full.flex-col.gap-8, .w-full.inner-item-BjaxFt",
+        "messageNodeSelector": "[data-message-id].flex-row.flex.w-full.justify-end, [data-message-id], .v_list_row",
+        "requireMessageNode": true
       },
       "icon": "doubao.com.png",
       "type": "information"
@@ -1698,33 +1807,13 @@
         }
       },
       "historyHandler": {
-        "urlFeature": "-"
+        "urlFeature": "/chat"
       },
       "userPrompt": {
         "containerSelector": "div.agent-chat__list__item--human, [class*=\"agent-dialogue\"][class*=\"human\"], [class*=\"chat-item\"][class*=\"human\"]",
         "textSelector": "div.agent-chat__bubble--human, [class*=\"human-bubble\"], [class*=\"human-message\"] p, [class*=\"human-message\"] div"
       },
       "icon": "yuanbao.tencent.com.png",
-      "type": "information"
-    },
-    {
-      "name": "Google",
-      "url": "https://www.google.com/search?q={query}",
-      "enabled": false,
-      "supportUrlQuery": true,
-      "region": "US",
-      "hidden": false,
-      "supportIframe": true,
-      "searchHandler": {
-        "steps": [
-          {
-            "action": "custom",
-            "customAction": "url_query",
-            "description": "使用URL查询，无需输入框操作"
-          }
-        ]
-      },
-      "icon": "www.google.com.png",
       "type": "information"
     },
     {
@@ -2542,6 +2631,27 @@
       "type": "information"
     },
     {
+      "name": "Google",
+      "url": "https://www.google.com/search?q={query}",
+      "enabled": false,
+      "supportUrlQuery": true,
+      "region": "US",
+      "hidden": false,
+      "hiddenInHomepage": true,
+      "supportIframe": true,
+      "searchHandler": {
+        "steps": [
+          {
+            "action": "custom",
+            "customAction": "url_query",
+            "description": "使用URL查询，无需输入框操作"
+          }
+        ]
+      },
+      "icon": "www.google.com.png",
+      "type": "information"
+    },
+    {
       "name": "小红书",
       "url": "https://www.xiaohongshu.com/search_result?keyword={query}",
       "enabled": false,
@@ -3109,7 +3219,7 @@
       "enabled": true,
       "supportUrlQuery": false,
       "region": "China",
-      "hidden": false,
+      "hidden": true,
       "supportIframe": true,
       "searchHandler": {
         "steps": [
@@ -3204,7 +3314,7 @@
         "textSelector": "div.message-content, div.message-content .text-pretty, div.message-content span"
       },
       "icon": "agent.minimax.io.png",
-      "type": "Agents"
+      "type": "information"
     },
     {
       "name": "Manus",
@@ -3212,7 +3322,7 @@
       "enabled": true,
       "supportUrlQuery": false,
       "region": "Global",
-      "hidden": false,
+      "hidden": true,
       "supportIframe": true,
       "searchHandler": {
         "steps": [
@@ -3272,7 +3382,7 @@
         "textSelector": "span.whitespace-pre-wrap.u-break-words"
       },
       "icon": "manus.im.png",
-      "type": "Agents"
+      "type": "information"
     },
     {
       "name": "Bing",
@@ -3431,115 +3541,6 @@
       },
       "icon": "www.google.com.png",
       "type": "image"
-    },
-    {
-      "name": "Google Translate",
-      "url": "https://translate.google.com/?sl=auto&tl=en&op=translate",
-      "enabled": true,
-      "supportUrlQuery": false,
-      "region": "Global",
-      "hidden": false,
-      "supportIframe": true,
-      "searchHandler": {
-        "steps": [
-          {
-            "action": "focus",
-            "selector": "textarea[role=\"combobox\"]",
-            "description": "聚焦 Google Translate 源文本输入框",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          },
-          {
-            "action": "setValue",
-            "selector": "textarea[role=\"combobox\"]",
-            "description": "设置 Google Translate 源文本内容",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          },
-          {
-            "action": "triggerEvents",
-            "selector": "textarea[role=\"combobox\"]",
-            "events": [
-              "input",
-              "change",
-              "blur",
-              "focus"
-            ],
-            "description": "触发 Google Translate 输入事件",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          }
-        ]
-      },
-      "contentExtractor": {
-        "contentSelectors": [
-          "span[lang=\"en\"]",
-          "span[jsname=\"W297wb\"]",
-          "div[aria-live=\"polite\"] span[jsname=\"W297wb\"]",
-          "div[aria-live=\"polite\"] span[lang]"
-        ]
-      },
-      "icon": "translate.google.com.png",
-      "type": "translate"
-    },
-    {
-      "name": "Bing Translate",
-      "url": "https://www.bing.com/translator",
-      "enabled": true,
-      "supportUrlQuery": false,
-      "region": "Global",
-      "hidden": false,
-      "supportIframe": true,
-      "searchHandler": {
-        "steps": [
-          {
-            "action": "focus",
-            "selector": "#tta_input_ta",
-            "description": "聚焦 Bing Translate 源文本输入框",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          },
-          {
-            "action": "setValue",
-            "selector": "#tta_input_ta",
-            "inputType": "special",
-            "specialConfig": {
-              "type": "custom-element",
-              "selector": "#tta_input_ta",
-              "method": "textContent"
-            },
-            "description": "设置 Bing Translate 源文本内容（contenteditable 文本节点）",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          },
-          {
-            "action": "triggerEvents",
-            "selector": "#tta_input_ta",
-            "events": [
-              "input",
-              "change",
-              "blur",
-              "focus"
-            ],
-            "description": "触发 Bing Translate 输入事件",
-            "waitForElement": true,
-            "maxAttempts": 10,
-            "retryInterval": 200
-          }
-        ]
-      },
-      "contentExtractor": {
-        "contentSelectors": [
-          "#tta_output_ta"
-        ]
-      },
-      "icon": "www.bing.com.png",
-      "type": "translate"
     }
   ]
 }
